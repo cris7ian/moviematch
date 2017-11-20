@@ -10,6 +10,28 @@ const getPerson = query =>
     .then(response => response.json())
     .catch(err => err)
 
+exports.getRevenue = async name => {
+  const result = await getPerson(name)
+
+  if (!result.length) {
+    console.log(
+      chalk.yellow('Sadly, we couldnt find anyone with the name'),
+      !result[0].length ? names[0] : names[1]
+    )
+    return
+  }
+
+  console.log(
+    chalk.magenta(`Revenue for ${result[0].name}`)
+  )
+
+  return fetch(`${SERVER}/revenue/${result[0].id}`)
+    .then(res => res.json())
+    .then(results => prettyPrintRevenue(results))
+    .catch(err => console.log(err))
+
+}
+
 exports.getConnection = async names => {
   const results = await Promise.all(names.map(getPerson))
 
@@ -28,13 +50,28 @@ exports.getConnection = async names => {
 
   return fetch(`${SERVER}/connection/${matches[0].id}/${matches[1].id}`)
     .then(res => res.json())
-    .then(results => prettyPrint(results, matches))
+    .then(results => prettyPrintConnection(results, matches))
     .catch(err => console.log(err))
 }
 
+const toRevenue = money => money.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+
 const printJob = person => (person.job ? person.job : person.character)
 
-const prettyPrint = (results, matches) => {
+const prettyPrintRevenue = results => {
+  console.log(`The total revenue so far has been $${chalk.green(toRevenue(results.revenue))}`)
+  results.credits
+    .filter(credit => !!credit.revenue)
+    .sort((a, b) => parseFloat(b.revenue) - parseFloat(a.revenue))
+    .map(credit => {
+      console.log(
+        `\t${credit.title} [${moment(credit.release_date).fromNow()}]`
+      )
+      console.log(chalk.dim(`\t$${(credit.revenue)}`))
+  })
+}
+
+const prettyPrintConnection = (results, matches) => {
   if (!results.moviesTheyWorkedIn.length) {
     console.log(
       cowsay.think({
