@@ -22,14 +22,15 @@ exports.getRevenue = async name => {
   }
 
   console.log(
-    chalk.magenta(`Revenue for ${result[0].name}`)
+    chalk.magenta(
+      `Fetching revenue for ${result[0].name}... (takes some time the first time)`
+    )
   )
 
   return fetch(`${SERVER}/revenue/${result[0].id}`)
     .then(res => res.json())
     .then(results => prettyPrintRevenue(results))
     .catch(err => console.log(err))
-
 }
 
 exports.getConnection = async names => {
@@ -45,7 +46,9 @@ exports.getConnection = async names => {
 
   const matches = results.map(partialResults => partialResults[0])
   console.log(
-    chalk.magenta(`Results for:\n\t${matches[0].name}\n\t${matches[1].name}`)
+    chalk.magenta(
+      `Fiding connections between\n\t${matches[0].name}\n\t${matches[1].name}`
+    )
   )
 
   return fetch(`${SERVER}/connection/${matches[0].id}/${matches[1].id}`)
@@ -54,12 +57,15 @@ exports.getConnection = async names => {
     .catch(err => console.log(err))
 }
 
-const toRevenue = money => money.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+const toRevenue = money =>
+  money.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
 
 const printJob = person => (person.job ? person.job : person.character)
 
 const prettyPrintRevenue = results => {
-  console.log(`The total revenue so far has been $${chalk.green(toRevenue(results.revenue))}`)
+  console.log(
+    `The total revenue so far has been $${chalk.green(toRevenue(results.revenue))}`
+  )
   results.credits
     .filter(credit => !!credit.revenue)
     .sort((a, b) => parseFloat(b.revenue) - parseFloat(a.revenue))
@@ -67,8 +73,8 @@ const prettyPrintRevenue = results => {
       console.log(
         `\t${credit.title} [${moment(credit.release_date).fromNow()}]`
       )
-      console.log(chalk.dim(`\t$${(credit.revenue)}`))
-  })
+      console.log(chalk.dim(`\t$${toRevenue(credit.revenue)}`))
+    })
 }
 
 const prettyPrintConnection = (results, matches) => {

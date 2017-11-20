@@ -99,7 +99,7 @@ npm install -g moviematch
 # Usage
 
 ```
-moviematch --names|-n [2 names, use quotes for full names] ||  --revenue|-r [name, use quotes for full names]
+moviematch --names [2 names, use quotes for full names] ||  --revenue [name, use quotes for full names]
 ```
 
 If you just put _tom_ it will find the most popular Tom (Hanks).
