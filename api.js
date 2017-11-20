@@ -60,7 +60,10 @@ exports.getConnection = async names => {
 const toRevenue = money =>
   money.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
 
-const printJob = person => (person.job ? person.job : person.character)
+const printJob = (id, people) => {
+  const person = people[0].name === id.toString() ? people[0] : people[1]
+  return person.job ? person.job : person.character
+}
 
 const prettyPrintRevenue = results => {
   console.log(
@@ -87,7 +90,7 @@ const prettyPrintConnection = (results, matches) => {
     )
     return
   }
-  console.log(chalk.magenta("\nProductions they've worked in:"))
+  console.log(chalk.magenta("\nProductions they've worked in together:"))
   results.moviesTheyWorkedIn
     .sort((a, b) => moment(a.date) < moment(b.date))
     .map(production => {
@@ -96,7 +99,7 @@ const prettyPrintConnection = (results, matches) => {
       )
       console.log(
         chalk.dim(
-          `\t${matches[0].name} as ${printJob(production.people[0])} and ${matches[1].name} as ${printJob(production.people[1])}\n`
+          `\t${matches[0].name} as ${printJob(matches[0].id, production.people)} and ${matches[1].name} as ${printJob(matches[1].id, production.people)}\n`
         )
       )
     })
