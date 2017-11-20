@@ -13,10 +13,9 @@ const getPerson = query =>
 exports.getRevenue = async name => {
   const result = await getPerson(name)
 
-  if (!result.length) {
+  if (!result.length || !result) {
     console.log(
-      chalk.yellow('Sadly, we couldnt find anyone with the name'),
-      !result[0].length ? names[0] : names[1]
+      chalk.yellow('Sadly, we couldnt find anyone with the name'), name
     )
     return
   }
